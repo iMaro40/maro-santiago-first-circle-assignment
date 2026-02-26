@@ -1,4 +1,4 @@
-import { CreateAccountRequestData } from './dto'
+import { CreateUserAccountRequestData } from './dto'
 import { UserAccount } from './model'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -8,7 +8,8 @@ export class UserAccountRepository {
   private usersById: Record<string, UserAccount> = {}
   private usersByEmail: Record<string, UserAccount> = {}
 
-  save({ email, name }: CreateAccountRequestData): UserAccount {
+  save({ email, name }: CreateUserAccountRequestData): UserAccount {
+    // Generating userId in repository level to simulate database PK
     const userId = uuidv4()
 
     const user: UserAccount = {
@@ -26,6 +27,12 @@ export class UserAccountRepository {
 
   findAccountByEmail(email: string) {
     const user = this.usersByEmail[email]
+
+    return user
+  }
+
+  findAccountById(userId: string) {
+    const user = this.usersById[userId]
 
     return user
   }

@@ -1,12 +1,9 @@
 import { CreateUserAccountRequestData } from './dto'
+import { UserAccount } from './model'
 import { UserAccountRepository } from './repository'
 
 export class UserAccountService {
-  private userAccountRepository: UserAccountRepository
-
-  constructor(userAccountRepository: UserAccountRepository) {
-    this.userAccountRepository = userAccountRepository
-  }
+  constructor(private userAccountRepository: UserAccountRepository) {}
 
   private validateCreateAccountRequest(data: CreateUserAccountRequestData) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -20,7 +17,6 @@ export class UserAccountService {
     if (userAccountByEmail) throw new Error('User with email exists')
   }
 
-  // TO DO: Optimistic locking
   createAccount(data: CreateUserAccountRequestData) {
     try {
       this.validateCreateAccountRequest(data)
@@ -29,7 +25,19 @@ export class UserAccountService {
     } catch (e) {
       console.error('Error creating user account', e)
 
-      // TO DO: Maybe send some notification to the user that the request failed
+      throw e
+    }
+  }
+
+  findUserById(userId: string): UserAccount {
+    try {
+      const user = this.userAccountRepository.findAccountById(userId)
+
+      if (!user) throw new Error('User does not exist')
+
+      return user
+    } catch (e) {
+      console.error('Error finding user account', e)
 
       throw e
     }
