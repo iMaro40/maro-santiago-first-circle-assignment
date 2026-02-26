@@ -17,7 +17,7 @@ export class UserAccountService {
     if (userAccountByEmail) throw new Error('User with email exists')
   }
 
-  createAccount(data: CreateUserAccountRequestData) {
+  createUserAccount(data: CreateUserAccountRequestData) {
     try {
       this.validateCreateAccountRequest(data)
 

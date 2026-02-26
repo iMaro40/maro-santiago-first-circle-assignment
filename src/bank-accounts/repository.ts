@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 export class BankAccountRepository {
   private bankAccountsById: Record<string, BankAccount> = {}
 
-  save({ userId }: CreateBankAccountRequestData) {
+  save({ userId }: CreateBankAccountRequestData): BankAccount {
     // Generating bankAccountId in repository level to simulate database PK
     const bankAccountId = uuidv4()
 
@@ -17,5 +17,21 @@ export class BankAccountRepository {
     }
 
     this.bankAccountsById[bankAccountId] = bankAccount
+
+    return bankAccount
+  }
+
+  // Simply update the whole object for simplicity in this assignment.
+  // Production systems would support partial updates which is more appropriate since we only update "balance" for withdrawals/deposits/transfers
+  update(bankAccount: BankAccount) {
+    this.bankAccountsById[bankAccount.id] = bankAccount
+
+    return bankAccount
+  }
+
+  findBankAccountById(bankAccountId: string) {
+    const bankAccount = this.bankAccountsById[bankAccountId]
+
+    return bankAccount
   }
 }

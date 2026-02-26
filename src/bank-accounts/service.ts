@@ -1,8 +1,5 @@
 import { UserAccountService } from '../user-accounts/service'
-import {
-  BankAccountActionRequestData,
-  CreateBankAccountRequestData,
-} from './dto'
+import { CreateBankAccountRequestData, WithdrawRequestData } from './dto'
 import { BankAccount } from './model'
 import { BankAccountRepository } from './repository'
 
@@ -16,43 +13,59 @@ export class BankAccountService {
     const userExists = this.userAccountService.findUserById(data.userId)
     if (!userExists) throw new Error('User not found')
   }
-  private executeCreateAccount(data: CreateBankAccountRequestData) {
-    this.bankAccountRepository.save(data)
-  }
-  createAccount(data: CreateBankAccountRequestData) {
-    this.runBankAccountAction<BankAccount>(
-      'CREATE_ACCOUNT',
-      (d) => this.validateCreateAccountRequestData(d),
-      (d) => this.executeCreateAccount(d),
-      data,
-    )
-  }
-
-  deposit() {}
-  withdraw() {}
-  transfer() {}
-  getBalanceOfAccount() {}
-
-  // Shared workflow wrapper for banking actions.
-  // Handles validation, execution, and error logging.
-  private runBankAccountAction<T>(
-    actionName: string,
-    validator: (data: BankAccountActionRequestData) => void,
-    fn: (data: BankAccountActionRequestData) => any,
-    data: BankAccountActionRequestData,
-  ): T {
+  createBankAccount(data: CreateBankAccountRequestData): BankAccount {
     try {
-      console.log('Executing bank account action', actionName, data)
+      this.validateCreateAccountRequestData(data)
 
-      validator(data)
+      const createdBankAccount = this.bankAccountRepository.save(data)
 
-      return fn(data)
-
-      // NOTE: Ledger persistence is out of scope for this assignment. Deposit/withdraw/transfer actions will need to be written into some ledger or similar.
+      return createdBankAccount
     } catch (e) {
-      console.log('Error executing bank account action', actionName, data, e)
+      console.error('Error creating bank account', data, e)
 
       throw e
     }
   }
+
+  private validateWithdrawRequestData({
+    amount,
+    bankAccountId,
+  }: WithdrawRequestData): BankAccount {
+    const decimalWith2PlacesRegEx = /^\d+(\.\d{1,2})?$/
+    if (!decimalWith2PlacesRegEx.test(String(amount)))
+      throw new Error('Amount must be valid number with at most 2 decimals')
+
+    const bankAccount =
+      this.bankAccountRepository.findBankAccountById(bankAccountId)
+    if (!bankAccount) throw new Error('Bank account does not exist')
+
+    const isAmountToWithdrawValid = amount <= bankAccount.balance
+    if (!isAmountToWithdrawValid) throw new Error('Invalid amount')
+
+    return bankAccount
+  }
+  withdraw(data: WithdrawRequestData) {
+    try {
+      console.log('Received withdraw request', data)
+
+      const bankAccount = this.validateWithdrawRequestData(data)
+
+      console.log('Executing withdraw request', data)
+
+      const newBalance = bankAccount.balance - data.amount
+      const updatedBankAccount = { ...bankAccount, balance: newBalance }
+
+      this.bankAccountRepository.update(updatedBankAccount)
+
+      // NOTE: Writing withdraw/deposit/transfer actions to a ledger is out of scope for this assignment
+    } catch (e) {
+      console.error('Error performing withdraw', data, e)
+
+      throw e
+    }
+  }
+
+  deposit() {}
+  transfer() {}
+  getBalanceOfAccount() {}
 }
