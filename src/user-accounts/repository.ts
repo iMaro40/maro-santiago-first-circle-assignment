@@ -18,7 +18,7 @@ export class UserAccountRepository {
       id: userId,
     }
 
-    // The write overhead of the "indexing". Now we need to make sure to maintain all the records.
+    // The write overhead of the "indexing" is that now we need to make sure to maintain all the records.
     this.usersById[userId] = user
     this.usersByEmail[email] = user
 

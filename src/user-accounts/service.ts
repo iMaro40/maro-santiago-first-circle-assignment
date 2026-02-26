@@ -2,6 +2,7 @@ import { CreateUserAccountRequestData } from './dto'
 import { UserAccount } from './model'
 import { UserAccountRepository } from './repository'
 
+// NOTE: No try/catch in the service methods and just let errors bubble up because I assume errors will be handled in an upper layer
 export class UserAccountService {
   constructor(private userAccountRepository: UserAccountRepository) {}
 
@@ -18,28 +19,16 @@ export class UserAccountService {
   }
 
   createUserAccount(data: CreateUserAccountRequestData) {
-    try {
-      this.validateCreateAccountRequest(data)
+    this.validateCreateAccountRequest(data)
 
-      this.userAccountRepository.save(data)
-    } catch (e) {
-      console.error('Error creating user account', e)
-
-      throw e
-    }
+    this.userAccountRepository.save(data)
   }
 
   findUserById(userId: string): UserAccount {
-    try {
-      const user = this.userAccountRepository.findAccountById(userId)
+    const user = this.userAccountRepository.findAccountById(userId)
 
-      if (!user) throw new Error('User does not exist')
+    if (!user) throw new Error('User does not exist')
 
-      return user
-    } catch (e) {
-      console.error('Error finding user account', e)
-
-      throw e
-    }
+    return user
   }
 }
