@@ -10,3 +10,9 @@ export interface WithdrawRequestData {
   bankAccountId: string
   amount: number // Assumes requests coming in are decimals with max. 2 decimal places.
 }
+
+export interface BankTransferRequestData {
+  fromBankAccountId: string
+  toBankAccountId: string
+  amount: number // Assumes requests coming in are decimals with max. 2 decimal places.
+}

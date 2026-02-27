@@ -1,5 +1,6 @@
 import { UserAccountService } from '../user-accounts/service'
 import {
+  BankTransferRequestData,
   CreateBankAccountRequestData,
   DepositRequestData,
   WithdrawRequestData,
@@ -38,14 +39,18 @@ export class BankAccountService {
     return bankAccount
   }
 
+  private validateAmount(amount: number) {
+    const isAmountValid = validateNumberIfPositiveDecimal(amount)
+    if (!isAmountValid)
+      throw new Error('Amount must be valid number with at most 2 decimals')
+  }
+
   // NOTE: Checking the permissions/authorization of the user requesting the deposit/withdrawal/transfer is out of scope for my submission.
   private validateDepositRequestData({
     amount,
     bankAccountId,
   }: DepositRequestData) {
-    const isAmountValid = validateNumberIfPositiveDecimal(amount)
-    if (!isAmountValid)
-      throw new Error('Amount must be valid number with at most 2 decimals')
+    this.validateAmount(amount)
 
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
@@ -68,9 +73,7 @@ export class BankAccountService {
     amount,
     bankAccountId,
   }: WithdrawRequestData): BankAccount {
-    const isAmountValid = validateNumberIfPositiveDecimal(amount)
-    if (!isAmountValid)
-      throw new Error('Amount must be valid number with at most 2 decimals')
+    this.validateAmount(amount)
 
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
@@ -81,10 +84,10 @@ export class BankAccountService {
   }
 
   withdraw(data: WithdrawRequestData) {
+    // NOTE: In production, this will probably need to be wrapped in a transaction or use some locking mechanism to ensure that withdrawals are checking the most up-to-date balance.
     const bankAccount = this.validateWithdrawRequestData(data)
 
-    // NOTE: Runs into the same concurrency issues as the deposit method in production
-    // Additionally, we probably need some locking mechanism again to ensure that withdrawals are checking the most up-to-date balance.
+    // NOTE: Also runs into the same concurrency issues as the deposit method
     const newBalance = bankAccount.balance - data.amount
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
@@ -94,7 +97,7 @@ export class BankAccountService {
   getBalanceOfAccount(bankAccountId: string) {
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
-    // NOTE: In production, might run into read-after-write issues but that really just depends on the whole setup (e.g. caching?  read replicas?)
+    // NOTE: In production, might run into read-after-write issues but that really just depends on the whole setup (e.g. stale cache?  read replicas lag?)
     const response = {
       id: bankAccount.id,
       balance: bankAccount.balance,
@@ -102,6 +105,43 @@ export class BankAccountService {
 
     return response
   }
+  private validateBankTransferRequestData({
+    fromBankAccountId,
+    toBankAccountId,
+    amount,
+  }: BankTransferRequestData) {
+    this.validateAmount(amount)
 
-  transfer() {}
+    const fromBankAccount =
+      this.getAndValidateBankAccountById(fromBankAccountId)
+    const toBankAccount = this.getAndValidateBankAccountById(toBankAccountId)
+
+    if (fromBankAccountId === toBankAccountId)
+      throw new Error('Cannot transfer to the same account')
+
+    const isAmountToTransferValid = amount <= fromBankAccount.balance
+    if (!isAmountToTransferValid) throw new Error('Invalid amount')
+
+    return { fromBankAccount, toBankAccount }
+  }
+
+  transfer(data: BankTransferRequestData) {
+    // NOTE: In production, this all needs to be wrapped in a transaction because we need this to be atomic
+
+    const { fromBankAccount, toBankAccount } =
+      this.validateBankTransferRequestData(data)
+
+    const newFromBalance = fromBankAccount.balance - data.amount
+    const updatedFromBankAccount = {
+      ...fromBankAccount,
+      balance: newFromBalance,
+    }
+
+    const newToBalance = toBankAccount.balance + data.amount
+    const updatedToBankAccount = { ...toBankAccount, balance: newToBalance }
+
+    // NOTE: This simple implementation right now is not atomic and will most likely cause issues in production. We would need need to use a transaction such that both accounts are updated together (or not at all in case of an error)
+    this.bankAccountRepository.update(updatedFromBankAccount)
+    this.bankAccountRepository.update(updatedToBankAccount)
+  }
 }
