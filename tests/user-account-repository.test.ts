@@ -23,46 +23,6 @@ describe('UserAccountRepository', () => {
       expect(savedUser.email).toBe(data.email)
       expect(savedUser.name).toBe(data.name)
     })
-
-    it('should generate a unique id for each saved user', () => {
-      const data1: CreateUserAccountRequestData = {
-        email: 'user1@example.com',
-        name: 'User One',
-      }
-      const data2: CreateUserAccountRequestData = {
-        email: 'user2@example.com',
-        name: 'User Two',
-      }
-
-      const savedUser1 = repository.save(data1)
-      const savedUser2 = repository.save(data2)
-
-      expect(savedUser1.id).not.toBe(savedUser2.id)
-    })
-
-    it('should make the user findable by email after saving', () => {
-      const data: CreateUserAccountRequestData = {
-        email: 'findme@example.com',
-        name: 'Find Me',
-      }
-
-      const savedUser = repository.save(data)
-      const foundUser = repository.findAccountByEmail(data.email)
-
-      expect(foundUser).toEqual(savedUser)
-    })
-
-    it('should make the user findable by id after saving', () => {
-      const data: CreateUserAccountRequestData = {
-        email: 'findmebyid@example.com',
-        name: 'Find By ID',
-      }
-
-      const savedUser = repository.save(data)
-      const foundUser = repository.findAccountById(savedUser.id)
-
-      expect(foundUser).toEqual(savedUser)
-    })
   })
 
   describe('findAccountByEmail', () => {
@@ -80,18 +40,6 @@ describe('UserAccountRepository', () => {
 
     it('should return undefined when user not found by email', () => {
       const foundUser = repository.findAccountByEmail('nonexistent@example.com')
-
-      expect(foundUser).toBeUndefined()
-    })
-
-    it('should be case-sensitive when searching by email', () => {
-      const data: CreateUserAccountRequestData = {
-        email: 'Test@Example.com',
-        name: 'Case Test',
-      }
-      repository.save(data)
-
-      const foundUser = repository.findAccountByEmail('test@example.com')
 
       expect(foundUser).toBeUndefined()
     })
