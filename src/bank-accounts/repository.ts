@@ -29,7 +29,7 @@ export class BankAccountRepository {
     return bankAccount
   }
 
-  findBankAccountById(bankAccountId: string) {
+  findBankAccountById(bankAccountId: string): BankAccount | undefined {
     const bankAccount = this.bankAccountsById[bankAccountId]
 
     return bankAccount

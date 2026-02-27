@@ -41,6 +41,7 @@ export class BankAccountService {
 
   private validateAmount(amount: number) {
     const isAmountValid = validateNumberIfPositiveDecimal(amount)
+
     if (!isAmountValid)
       throw new Error('Amount must be valid number with at most 2 decimals')
   }

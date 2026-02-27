@@ -68,12 +68,5 @@ describe('UserAccountService', () => {
       expect(result).toBe(user)
       expect(repo.findAccountById).toHaveBeenCalledWith(user.id)
     })
-
-    it('should throw an error if the user does not exist', () => {
-      repo.findAccountById.mockReturnValue(undefined)
-      expect(() => service.findUserById('missing-id')).toThrow(
-        'User does not exist',
-      )
-    })
   })
 })

@@ -23,10 +23,8 @@ export class UserAccountService {
     this.userAccountRepository.save(data)
   }
 
-  findUserById(userId: string): UserAccount {
+  findUserById(userId: string): UserAccount | undefined {
     const user = this.userAccountRepository.findAccountById(userId)
-
-    if (!user) throw new Error('User does not exist')
 
     return user
   }
