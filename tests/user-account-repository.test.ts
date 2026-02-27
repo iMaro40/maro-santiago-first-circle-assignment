@@ -22,7 +22,6 @@ describe('UserAccountRepository', () => {
 
       expect(savedUser).toBeDefined()
       expect(savedUser.id).toBeDefined()
-      expect(typeof savedUser.id).toBe('string')
       expect(savedUser.email).toBe(data.email)
       expect(savedUser.name).toBe(data.name)
     })

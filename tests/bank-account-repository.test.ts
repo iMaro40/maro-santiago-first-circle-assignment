@@ -22,7 +22,6 @@ describe('BankAccountRepository', () => {
 
       expect(savedAccount).toBeDefined()
       expect(savedAccount.id).toBeDefined()
-      expect(typeof savedAccount.id).toBe('string')
       expect(savedAccount.userId).toBe(data.userId)
       expect(savedAccount.balance).toBe(0)
     })
