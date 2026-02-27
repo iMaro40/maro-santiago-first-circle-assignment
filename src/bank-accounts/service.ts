@@ -18,11 +18,12 @@ export class BankAccountService {
     private bankAccountRepository: BankAccountRepository,
     private userAccountService: UserAccountService,
   ) {}
-
   private validateCreateAccountRequestData(data: CreateBankAccountRequestData) {
     const userExists = this.userAccountService.findUserById(data.userId)
     if (!userExists) throw new Error('User not found')
   }
+
+  // NOTE: Checking the permissions/authorization of the user requesting these actions is out of scope for my submission.
   createBankAccount(data: CreateBankAccountRequestData): BankAccount {
     this.validateCreateAccountRequestData(data)
 
@@ -46,7 +47,6 @@ export class BankAccountService {
       throw new Error('Amount must be valid number with at most 2 decimals')
   }
 
-  // NOTE: Checking the permissions/authorization of the user requesting the deposit/withdrawal/transfer is out of scope for my submission.
   private validateDepositRequestData({
     amount,
     bankAccountId,
@@ -63,7 +63,7 @@ export class BankAccountService {
 
     // NOTE: This is a simple, straightforward implementation for my submission, but in production this would most likely run into concurrency issues.
     // This does not safely handle concurrent deposits happening at the same time for the same bank account.
-    // In production, this would likely be handled by a database transaction with proper isolation level, or by using some locking mechanism.
+    // In production, this would likely be handled by a database transaction, or by using some lock.
     const newBalance = bankAccount.balance + data.amount
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
@@ -85,7 +85,7 @@ export class BankAccountService {
   }
 
   withdraw(data: WithdrawRequestData) {
-    // NOTE: In production, this will probably need to be wrapped in a transaction or use some locking mechanism to ensure that withdrawals are checking the most up-to-date balance.
+    // NOTE: In production, this will probably need to be wrapped in a transaction or use some lock to ensure that withdrawals are checking the most up-to-date balance.
     const bankAccount = this.validateWithdrawRequestData(data)
 
     // NOTE: Also runs into the same concurrency issues as the deposit method
@@ -98,7 +98,7 @@ export class BankAccountService {
   getBalanceOfAccount(bankAccountId: string) {
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
-    // NOTE: In production, might run into read-after-write issues but that really just depends on the whole setup (e.g. stale cache?  read replicas lag?)
+    // NOTE: In production, might run into read-after-write issues but that really depends on what the whole setup is like(e.g. stale cache?  read replicas lag?)
     const response = {
       id: bankAccount.id,
       balance: bankAccount.balance,

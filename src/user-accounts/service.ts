@@ -2,6 +2,7 @@ import { CreateUserAccountRequestData } from './dto'
 import { UserAccount } from './model'
 import { UserAccountRepository } from './repository'
 
+// NOTE: Logins and authentication are out of scope for my submission
 export class UserAccountService {
   constructor(private userAccountRepository: UserAccountRepository) {}
 
