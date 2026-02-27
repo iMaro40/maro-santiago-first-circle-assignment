@@ -5,9 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch",
-    "test": "jest --coverage",
-    "start:dev": "npm run build && node ./build/index.js"
+    "test": "jest --coverage"
   },
   "author": "",
   "license": "ISC",

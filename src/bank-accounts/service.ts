@@ -67,7 +67,7 @@ export class BankAccountService {
     const newBalance = bankAccount.balance + data.amount
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
-    this.bankAccountRepository.update(updatedBankAccount)
+    return this.bankAccountRepository.update(updatedBankAccount)
   }
 
   private validateWithdrawRequestData({
@@ -92,7 +92,7 @@ export class BankAccountService {
     const newBalance = bankAccount.balance - data.amount
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
-    this.bankAccountRepository.update(updatedBankAccount)
+    return this.bankAccountRepository.update(updatedBankAccount)
   }
 
   getBalanceOfAccount(bankAccountId: string) {
