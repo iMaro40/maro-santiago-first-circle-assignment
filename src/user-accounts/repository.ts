@@ -25,13 +25,13 @@ export class UserAccountRepository {
     return user
   }
 
-  findAccountByEmail(email: string) {
+  findAccountByEmail(email: string): UserAccount | undefined {
     const user = this.usersByEmail[email]
 
     return user
   }
 
-  findAccountById(userId: string) {
+  findAccountById(userId: string): UserAccount | undefined {
     const user = this.usersById[userId]
 
     return user

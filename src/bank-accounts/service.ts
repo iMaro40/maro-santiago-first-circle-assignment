@@ -48,6 +48,7 @@ export class BankAccountService {
 
     return bankAccount
   }
+
   deposit(data: DepositRequestData) {
     const bankAccount = this.validateDepositRequestData(data)
 
