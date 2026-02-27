@@ -2,7 +2,6 @@ import { CreateUserAccountRequestData } from './dto'
 import { UserAccount } from './model'
 import { UserAccountRepository } from './repository'
 
-// NOTE: No try/catch in the service methods and just let errors bubble up because I assume errors will be handled in an upper layer
 export class UserAccountService {
   constructor(private userAccountRepository: UserAccountRepository) {}
 

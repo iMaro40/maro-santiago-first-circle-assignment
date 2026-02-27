@@ -4,11 +4,14 @@ import {
   DepositRequestData,
   WithdrawRequestData,
 } from './dto'
-import { validateNumberIfDecimal } from './helpers'
+import { validateNumberIfPositiveDecimal } from './helpers'
 import { BankAccount } from './model'
 import { BankAccountRepository } from './repository'
 
-// NOTE: No try/catch in the service methods and just let errors bubble up because I assume errors will be handled in an upper layer
+// NOTE: No try/catch in the methods here just to make my submission less verbose. In production, what we can do is let service errors just bubble up like this, and then handle the errors in an upper, more centralized layer.
+// In production, important considerations for retries would be:
+// 1. Idempotency: ensure retrying operations will not cause unintended duplications
+// 2. Ordered retries: ensure that retries are processed in the correct order, especially for operations that depend on each other (e.g., a withdrawal after a deposit)
 export class BankAccountService {
   constructor(
     private bankAccountRepository: BankAccountRepository,
@@ -35,12 +38,12 @@ export class BankAccountService {
     return bankAccount
   }
 
-  // NOTE: Checking the permissions/authorization of the user requesting the deposit/withdrawal/transfer is out of scope for the assignment
+  // NOTE: Checking the permissions/authorization of the user requesting the deposit/withdrawal/transfer is out of scope for my submission.
   private validateDepositRequestData({
     amount,
     bankAccountId,
   }: DepositRequestData) {
-    const isAmountValid = validateNumberIfDecimal(amount)
+    const isAmountValid = validateNumberIfPositiveDecimal(amount)
     if (!isAmountValid)
       throw new Error('Amount must be valid number with at most 2 decimals')
 
@@ -52,23 +55,20 @@ export class BankAccountService {
   deposit(data: DepositRequestData) {
     const bankAccount = this.validateDepositRequestData(data)
 
-    // NOTE: explain how in production this simple implementation is gonna need some help
-    // Runs into concurrency problems
-    // Needs transactions/DB locking
+    // NOTE: This is a simple, straightforward implementation for my submission, but in production this would most likely run into concurrency issues.
+    // This does not safely handle concurrent deposits happening at the same time for the same bank account.
+    // In production, this would likely be handled by a database transaction with proper isolation level, or by using some locking mechanism.
     const newBalance = bankAccount.balance + data.amount
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
     this.bankAccountRepository.update(updatedBankAccount)
-
-    // NOTE: Persisting the deposit/withdraw/transfer actions to some ledger is out of scope for the assignment
-    // NOTE: Usually some notification system is used to alert users of successful deposits/withdrawals/transfers
   }
 
   private validateWithdrawRequestData({
     amount,
     bankAccountId,
   }: WithdrawRequestData): BankAccount {
-    const isAmountValid = validateNumberIfDecimal(amount)
+    const isAmountValid = validateNumberIfPositiveDecimal(amount)
     if (!isAmountValid)
       throw new Error('Amount must be valid number with at most 2 decimals')
 
@@ -83,6 +83,8 @@ export class BankAccountService {
   withdraw(data: WithdrawRequestData) {
     const bankAccount = this.validateWithdrawRequestData(data)
 
+    // NOTE: Runs into the same concurrency issues as the deposit method in production
+    // Additionally, we probably need some locking mechanism again to ensure that withdrawals are checking the most up-to-date balance.
     const newBalance = bankAccount.balance - data.amount
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
@@ -92,6 +94,7 @@ export class BankAccountService {
   getBalanceOfAccount(bankAccountId: string) {
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
+    // NOTE: In production, might run into read-after-write issues but that really just depends on the whole setup (e.g. caching?  read replicas?)
     const response = {
       id: bankAccount.id,
       balance: bankAccount.balance,
