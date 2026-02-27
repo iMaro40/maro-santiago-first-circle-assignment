@@ -1,6 +1,3 @@
-// ensure uuid is mocked to avoid ESM import issues
-jest.mock('uuid')
-
 import { UserAccountRepository } from '../src/user-accounts/repository'
 import { CreateUserAccountRequestData } from '../src/user-accounts/dto'
 

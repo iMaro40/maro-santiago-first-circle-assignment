@@ -16,12 +16,13 @@
     "@babel/preset-typescript": "^7.28.5",
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
+    "@types/uuid": "^10.0.0",
     "eslint": "^10.0.2",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
-    "uuid": "^13.0.0"
+    "uuid": "^8.3.2"
   },
   "dependencies": {
     "globals": "^17.3.0"

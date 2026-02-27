@@ -17,10 +17,10 @@ export class UserAccountService {
     if (userAccountByEmail) throw new Error('User with email exists')
   }
 
-  createUserAccount(data: CreateUserAccountRequestData) {
+  createUserAccount(data: CreateUserAccountRequestData): UserAccount {
     this.validateCreateAccountRequest(data)
 
-    this.userAccountRepository.save(data)
+    return this.userAccountRepository.save(data)
   }
 
   findUserById(userId: string): UserAccount | undefined {

@@ -1,6 +1,3 @@
-// ensure uuid is mocked to avoid ESM import issues
-jest.mock('uuid')
-
 import { BankAccountRepository } from '../src/bank-accounts/repository'
 import { CreateBankAccountRequestData } from '../src/bank-accounts/dto'
 import { BankAccount } from '../src/bank-accounts/model'
