@@ -20,8 +20,8 @@ export class BankAccountService {
     private userAccountService: UserAccountService,
   ) {}
 
-  // NOTE: In production, we need to ensure there is clear documentation and communication on how we treat "amount" and "balance" to avoid confusion (i.e. we multiply by 100 to avoid floating point imprecision)
-  private validateAmount(amount: Money): asserts amount is Money {
+  // NOTE: In production, we need to ensure there is clear documentation and communication on how we store "amount" and "balance" to avoid confusion (i.e. we multiply by 100 to avoid floating point imprecision)
+  private validateAmount(amount: Money) {
     const isAmountValid = isValidPositiveInteger(amount)
 
     if (!isAmountValid)

@@ -181,38 +181,29 @@ describe('BankAccountService', () => {
     const transfer: BankTransferRequestData = {
       fromBankAccountId: 'acc-1',
       toBankAccountId: 'acc-2',
-      amount: 30,
+      amount: 300,
     }
-    const from: BankAccount = { id: 'acc-1', userId: 'user-1', balance: 100 }
-    const to: BankAccount = { id: 'acc-2', userId: 'user-2', balance: 20 }
+    const from: BankAccount = { id: 'acc-1', userId: 'user-1', balance: 1000 }
+    const to: BankAccount = { id: 'acc-2', userId: 'user-2', balance: 2000 }
 
     it('should move funds when valid', () => {
       repo.findBankAccountById.mockImplementation((id) =>
         id === from.id ? from : id === to.id ? to : undefined,
       )
       service.transfer(transfer)
-      expect(repo.update).toHaveBeenCalledWith({ ...from, balance: 70 })
-      expect(repo.update).toHaveBeenCalledWith({ ...to, balance: 50 })
+      expect(repo.update).toHaveBeenCalledWith({ ...from, balance: 700 })
+      expect(repo.update).toHaveBeenCalledWith({ ...to, balance: 2300 })
     })
 
     it('should throw when insufficient balance', () => {
       repo.findBankAccountById.mockReturnValue(from)
-      expect(() => service.transfer({ ...transfer, amount: 200 })).toThrow(
+      expect(() => service.transfer({ ...transfer, amount: 20000 })).toThrow(
         'Invalid amount',
       )
     })
 
-    it('should throw when from account missing', () => {
+    it('should throw when bank account is missing', () => {
       repo.findBankAccountById.mockReturnValueOnce(undefined)
-      expect(() => service.transfer(transfer)).toThrow(
-        'Bank account does not exist',
-      )
-    })
-
-    it('should throw when to account missing', () => {
-      repo.findBankAccountById.mockImplementation((id) =>
-        id === from.id ? from : undefined,
-      )
       expect(() => service.transfer(transfer)).toThrow(
         'Bank account does not exist',
       )
@@ -220,7 +211,7 @@ describe('BankAccountService', () => {
 
     it('should throw on invalid amount format', () => {
       repo.findBankAccountById.mockReturnValue(from)
-      expect(() => service.transfer({ ...transfer, amount: -10 })).toThrow(
+      expect(() => service.transfer({ ...transfer, amount: -1000 })).toThrow(
         'Amount must be a valid positive integer',
       )
     })

@@ -23,6 +23,20 @@ describe('BankAccountRepository', () => {
       expect(savedAccount.balance).toBe(0)
     })
 
+    it('should save a bank account and return it with a generated id and initial balance', () => {
+      const data: CreateBankAccountRequestData = {
+        userId: 'user-123',
+        initialBalance: 50000,
+      }
+
+      const savedAccount = repository.save(data)
+
+      expect(savedAccount).toBeDefined()
+      expect(savedAccount.id).toBeDefined()
+      expect(savedAccount.userId).toBe(data.userId)
+      expect(savedAccount.balance).toBe(data.initialBalance)
+    })
+
     it('should allow multiple accounts for the same user', () => {
       const userId = 'user-same'
       const data1: CreateBankAccountRequestData = { userId }

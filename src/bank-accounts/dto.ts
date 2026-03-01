@@ -2,7 +2,7 @@ export type Money = number // We will treat this as a positive integer represent
 
 export type CreateBankAccountRequestData = {
   userId: string
-  initialBalance?: Money
+  initialBalance?: Money // a.k.a. Initial deposit
 }
 export interface DepositRequestData {
   bankAccountId: string
