@@ -31,9 +31,8 @@ describe('BankAccountService', () => {
   })
 
   describe('createBankAccount', () => {
-    const data: CreateBankAccountRequestData = { userId: 'user-1' }
-
-    it('should create if user exists', () => {
+    it('should create with default balance when no initialBalance provided', () => {
+      const data: CreateBankAccountRequestData = { userId: 'user-1' }
       userService.findUserById.mockReturnValue({
         id: 'user-1',
         email: 'a@b.com',
@@ -48,11 +47,46 @@ describe('BankAccountService', () => {
 
       const result = service.createBankAccount(data)
       expect(result.id).toBe(account.id)
+      expect(result.balance).toBe(0)
       expect(userService.findUserById).toHaveBeenCalledWith(data.userId)
       expect(repo.save).toHaveBeenCalledWith(data)
     })
 
+    it('should create with initialBalance when provided', () => {
+      const data: CreateBankAccountRequestData = {
+        userId: 'user-1',
+        initialBalance: 50000, // $500.00
+      }
+      userService.findUserById.mockReturnValue({
+        id: 'user-1',
+        email: 'a@b.com',
+        name: 'A',
+      })
+      const account: BankAccount = {
+        id: 'acc-1',
+        userId: data.userId,
+        balance: 50000,
+      }
+      repo.save.mockReturnValue(account)
+
+      const result = service.createBankAccount(data)
+      expect(result.balance).toBe(50000)
+      expect(repo.save).toHaveBeenCalledWith(data)
+    })
+
+    it('should throw when initialBalance is invalid', () => {
+      const data: CreateBankAccountRequestData = {
+        userId: 'user-1',
+        initialBalance: -100,
+      }
+      expect(() => service.createBankAccount(data)).toThrow(
+        'Amount must be a valid positive integer',
+      )
+      expect(repo.save).not.toHaveBeenCalled()
+    })
+
     it('should throw when user not found', () => {
+      const data: CreateBankAccountRequestData = { userId: 'user-1' }
       userService.findUserById.mockReturnValue(undefined)
       expect(() => service.createBankAccount(data)).toThrow('User not found')
       expect(repo.save).not.toHaveBeenCalled()
