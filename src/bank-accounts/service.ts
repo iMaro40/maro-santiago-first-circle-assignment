@@ -5,13 +5,13 @@ import {
   DepositRequestData,
   WithdrawRequestData,
 } from './dto'
-import { validateNumberIfPositiveDecimal } from './helpers'
+import { isValidPositiveInteger } from './helpers'
 import { BankAccount } from './model'
 import { BankAccountRepository } from './repository'
 
-// NOTE: No try/catch in the methods here just to make my submission less verbose. In production, what we can do is let service errors just bubble up like this, and then handle the errors in an upper, more centralized layer.
-// In production, important considerations for retries would be:
-// 1. Idempotency: ensure retrying operations will not cause unintended duplications
+// NOTE: No try/catch in the methods here just to make my submission less verbose. In production, what we can do is let service errors just bubble up like this, and then handle the errors in some upper, centralized layer.
+// Additionally, important considerations for retries in production would be:
+// 1. Idempotency: ensure retries do not cause unintended duplications
 // 2. Ordered retries: ensure that retries are processed in the correct order, especially for operations that depend on each other (e.g., a withdrawal after a deposit)
 export class BankAccountService {
   constructor(
@@ -40,11 +40,12 @@ export class BankAccountService {
     return bankAccount
   }
 
+  // NOTE: In production, we need to ensure there is clear documentation and communication on how we treat "amount" and "balance" to avoid confusion (i.e. we multiply by 100 to avoid floating point imprecision)
   private validateAmount(amount: number) {
-    const isAmountValid = validateNumberIfPositiveDecimal(amount)
+    const isAmountValid = isValidPositiveInteger(amount)
 
     if (!isAmountValid)
-      throw new Error('Amount must be valid number with at most 2 decimals')
+      throw new Error('Amount must be a valid positive integer')
   }
 
   private validateDepositRequestData({
@@ -98,7 +99,7 @@ export class BankAccountService {
   getBalanceOfAccount(bankAccountId: string) {
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
-    // NOTE: In production, might run into read-after-write issues but that really depends on what the whole setup is like(e.g. stale cache?  read replicas lag?)
+    // NOTE: In production, might run into read-after-write issues but that really depends on what the whole setup is like (e.g. stale cache?  read replicas lag?)
     const response = {
       id: bankAccount.id,
       balance: bankAccount.balance,

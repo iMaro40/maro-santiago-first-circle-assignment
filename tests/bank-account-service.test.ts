@@ -76,7 +76,7 @@ describe('BankAccountService', () => {
     it('should throw for invalid amount', () => {
       repo.findBankAccountById.mockReturnValue(account)
       expect(() => service.deposit({ ...deposit, amount: -5 })).toThrow(
-        'Amount must be valid number with at most 2 decimals',
+        'Amount must be a valid positive integer',
       )
       expect(repo.update).not.toHaveBeenCalled()
     })
@@ -106,7 +106,7 @@ describe('BankAccountService', () => {
     it('should throw on negative amount', () => {
       repo.findBankAccountById.mockReturnValue(account)
       expect(() => service.withdraw({ ...withdraw, amount: -1 })).toThrow(
-        'Amount must be valid number with at most 2 decimals',
+        'Amount must be a valid positive integer',
       )
     })
 
@@ -187,7 +187,7 @@ describe('BankAccountService', () => {
     it('should throw on invalid amount format', () => {
       repo.findBankAccountById.mockReturnValue(from)
       expect(() => service.transfer({ ...transfer, amount: -10 })).toThrow(
-        'Amount must be valid number with at most 2 decimals',
+        'Amount must be a valid positive integer',
       )
     })
   })

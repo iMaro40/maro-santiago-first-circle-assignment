@@ -1,5 +1,8 @@
-export const validateNumberIfPositiveDecimal = (num: number) => {
-  const positiveDecimallWith2PlacesRegEx = /^(?!0+(\.0{1,2})?$)\d+(\.\d{1,2})?$/
+export const isValidPositiveInteger = (value: unknown): value is number => {
+  if (typeof value !== 'number') return false
+  if (!Number.isFinite(value)) return false
+  if (!Number.isInteger(value)) return false
+  if (value <= 0) return false
 
-  return positiveDecimallWith2PlacesRegEx.test(String(num))
+  return true
 }

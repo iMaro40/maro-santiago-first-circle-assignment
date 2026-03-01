@@ -1,6 +1,6 @@
 ## About
 
-Submission by Maro Santiago. I have lots of comments in the BankAccountService class on scope, and considerations for production.
+For this submission, the implementation is simple and straightforward, but catches when a request would be valid or invalid. I have left comments in the code on the scope of the submission, as well as many considerations for production systems.
 
 ## How To Run
 
