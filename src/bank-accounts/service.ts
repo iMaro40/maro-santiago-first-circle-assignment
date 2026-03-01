@@ -3,6 +3,7 @@ import {
   BankTransferRequestData,
   CreateBankAccountRequestData,
   DepositRequestData,
+  Money,
   WithdrawRequestData,
 } from './dto'
 import { isValidPositiveInteger } from './helpers'
@@ -18,8 +19,22 @@ export class BankAccountService {
     private bankAccountRepository: BankAccountRepository,
     private userAccountService: UserAccountService,
   ) {}
-  private validateCreateAccountRequestData(data: CreateBankAccountRequestData) {
-    const userExists = this.userAccountService.findUserById(data.userId)
+
+  // NOTE: In production, we need to ensure there is clear documentation and communication on how we treat "amount" and "balance" to avoid confusion (i.e. we multiply by 100 to avoid floating point imprecision)
+  private validateAmount(amount: Money): asserts amount is Money {
+    const isAmountValid = isValidPositiveInteger(amount)
+
+    if (!isAmountValid)
+      throw new Error('Amount must be a valid positive integer')
+  }
+
+  private validateCreateAccountRequestData({
+    userId,
+    initialBalance,
+  }: CreateBankAccountRequestData) {
+    if (initialBalance != undefined) this.validateAmount(initialBalance)
+
+    const userExists = this.userAccountService.findUserById(userId)
     if (!userExists) throw new Error('User not found')
   }
 
@@ -38,14 +53,6 @@ export class BankAccountService {
     if (!bankAccount) throw new Error('Bank account does not exist')
 
     return bankAccount
-  }
-
-  // NOTE: In production, we need to ensure there is clear documentation and communication on how we treat "amount" and "balance" to avoid confusion (i.e. we multiply by 100 to avoid floating point imprecision)
-  private validateAmount(amount: number) {
-    const isAmountValid = isValidPositiveInteger(amount)
-
-    if (!isAmountValid)
-      throw new Error('Amount must be a valid positive integer')
   }
 
   private validateDepositRequestData({

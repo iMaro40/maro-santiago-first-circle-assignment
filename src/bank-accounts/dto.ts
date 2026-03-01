@@ -1,18 +1,21 @@
-import { BankAccount } from './model'
+export type Money = number // We will treat this as a positive integer representing the amount in cents. For example, $100.50 would be represented as 10050.
 
-export type CreateBankAccountRequestData = Omit<BankAccount, 'id' | 'balance'>
+export type CreateBankAccountRequestData = {
+  userId: string
+  initialBalance?: Money
+}
 export interface DepositRequestData {
   bankAccountId: string
-  amount: number // We will accept positive integers here. We will treat 10050 for example as $100.50 since that's how we store it.
+  amount: Money
 }
 
 export interface WithdrawRequestData {
   bankAccountId: string
-  amount: number // We will accept positive integers here. We will treat 10050 for example as $100.50 since that's how we store it.
+  amount: Money
 }
 
 export interface BankTransferRequestData {
   fromBankAccountId: string
   toBankAccountId: string
-  amount: number // We will accept positive integers here. We will treat 10050 for example as $100.50 since that's how we store it.
+  amount: Money
 }
