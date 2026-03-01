@@ -76,6 +76,8 @@ export class BankAccountService {
     const updatedBankAccount = { ...bankAccount, balance: newBalance }
 
     return this.bankAccountRepository.update(updatedBankAccount)
+
+    // NOTE: In production some ledger service is usually involved for financial transactions for audit and traceability purposes, but that is out of scope for my submission
   }
 
   private validateWithdrawRequestData({
