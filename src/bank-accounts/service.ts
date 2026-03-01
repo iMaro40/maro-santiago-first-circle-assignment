@@ -87,7 +87,7 @@ export class BankAccountService {
     const bankAccount = this.getAndValidateBankAccountById(bankAccountId)
 
     const isAmountToWithdrawValid = amount <= bankAccount.balance
-    if (!isAmountToWithdrawValid) throw new Error('Invalid amount')
+    if (!isAmountToWithdrawValid) throw new Error('Insufficient balance')
 
     return bankAccount
   }

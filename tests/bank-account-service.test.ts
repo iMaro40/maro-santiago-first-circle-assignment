@@ -146,7 +146,7 @@ describe('BankAccountService', () => {
 
     it('should throw on insufficient funds', () => {
       repo.findBankAccountById.mockReturnValue({ ...account, balance: 10 })
-      expect(() => service.withdraw(withdraw)).toThrow('Invalid amount')
+      expect(() => service.withdraw(withdraw)).toThrow('Insufficient balance')
     })
 
     it('should throw when account missing', () => {
