@@ -149,7 +149,7 @@ export class BankAccountService {
     const newToBalance = toBankAccount.balance + data.amount
     const updatedToBankAccount = { ...toBankAccount, balance: newToBalance }
 
-    // NOTE: This simple implementation right now is not atomic and will most likely cause issues in production. We would need need to use a transaction such that both accounts are updated together (or not at all in case of an error)
+    // NOTE: This should be atomic. We would need need to use a transaction to make sure both accounts are updated together (or not at all in case of an error)
     this.bankAccountRepository.update(updatedFromBankAccount)
     this.bankAccountRepository.update(updatedToBankAccount)
   }

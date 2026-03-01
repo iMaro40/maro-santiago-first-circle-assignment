@@ -1,6 +1,16 @@
 ## About
 
-For this submission, the implementation is simple and straightforward, but catches when a request would be valid or invalid. I have left comments in the code on the scope of the submission, as well as many considerations for production systems.
+1. I created the `BankAccountService` class to provide the functionalities outlined in the spec:
+   - Account creation -> `createBankAccount()`
+   - Deposit -> `deposit()`
+   - Withdrawal -> `withdraw()`
+   - Transfer -> `transfer`
+   - Account balance: -> `getBalanceOfAccount()`
+2. Data is stored in memory in the `BankAccountRepository` class via class variables.
+   - This is a singleton class initialized in `init.ts`.
+3. I've also created the `user-accounts` domain to mimic real life business flow where:
+   - Ony valid users within your application should be able to create bank accounts
+   - Users can create multiple bank accounts
 
 ## How To Run
 
